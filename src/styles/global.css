@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+@theme {
+  /* High-end design tokens & colors calibrated for Ethereal Dark & warm Soft-Minimal Light modes */
+  --color-primary: var(--primary);
+  --color-primary-active: var(--primary-active);
+  --color-ink: var(--ink);
+  --color-body-text: var(--body-text);
+  --color-muted-text: var(--muted-text);
+  --color-muted-soft: var(--muted-soft);
+  
+  --color-hairline: var(--hairline);
+  --color-hairline-soft: var(--hairline-soft);
+  
+  --color-canvas: var(--canvas);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-card: var(--surface-card);
+  --color-surface-bezel: var(--surface-bezel);
+  
+  --color-brand-accent: #3b82f6;
+  --color-brand-glow: rgba(59, 130, 246, 0.15);
+  --color-success-state: #10b981;
+  --color-success-glow: rgba(16, 185, 129, 0.15);
+  --color-warning-state: #f59e0b;
+  --color-error-state: #ef4444;
+  --color-error-glow: rgba(239, 68, 68, 0.15);
+
+  /* Spacing */
+  --spacing-4_5: 1.125rem;
+
+  /* Typography / Fonts - Plus Jakarta Sans & System display */
+  --font-display: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-body: "Plus Jakarta Sans", "Inter", sans-serif;
+  
+  /* Custom spring-like easing transition */
+  --animate-spring: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light Theme (Warm Soft-Minimalist) */
+:root {
+  --primary: #18181b;
+  --primary-active: #09090b;
+  --ink: #09090b;
+  --body-text: #3f3f46;
+  --muted-text: #71717a;
+  --muted-soft: #a1a1aa;
+  
+  --hairline: rgba(0, 0, 0, 0.06);
+  --hairline-soft: rgba(0, 0, 0, 0.03);
+  
+  --canvas: #fafaf9;
+  --surface-soft: #f4f4f5;
+  --surface-card: #ffffff;
+  --surface-bezel: rgba(0, 0, 0, 0.03);
+}
+
+/* Dark Theme (Ethereal OLED Dark) */
+:root.dark {
+  --primary: #ffffff;
+  --primary-active: #f4f4f5;
+  --ink: #f4f4f5;
+  --body-text: #a1a1aa;
+  --muted-text: #71717a;
+  --muted-soft: #52525b;
+  
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-soft: rgba(255, 255, 255, 0.04);
+  
+  --canvas: #09090b;
+  --surface-soft: #121215;
+  --surface-card: #18181b;
+  --surface-bezel: rgba(255, 255, 255, 0.03);
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--body-text);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-soft);
+}
+
+/* Double-Bezel nested architecture classes */
+.bezel-container {
+  background: var(--surface-bezel);
+  border: 1px solid var(--hairline-soft);
+  padding: 6px;
+  border-radius: 24px;
+  transition: var(--animate-spring);
+}
+
+.bezel-inner {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .bezel-inner {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.02);
+}
+
+/* Kinetic button styles */
+.btn-premium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 99px;
+  transition: var(--animate-spring);
+  cursor: pointer;
+}
+
+.btn-premium:active {
+  transform: scale(0.96);
+}
+
+.btn-premium-primary {
+  background: var(--primary);
+  color: var(--canvas);
+}
+
+.btn-premium-primary:hover {
+  background: var(--primary-active);
+  box-shadow: 0 8px 16px -4px var(--brand-glow);
+}
+
+.btn-premium-secondary {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+}
+
+.btn-premium-secondary:hover {
+  background: var(--surface-soft);
+  border-color: var(--muted-soft);
+}

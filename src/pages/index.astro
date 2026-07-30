@@ -1,0 +1,99 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Presento | Attendance Tracker" hideNav={true}>
+  <div class="flex-grow flex flex-col justify-between py-10 space-y-16 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+    
+    <!-- Hero Editorial Copy -->
+    <div class="space-y-6 text-center">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-soft border border-hairline text-[10px] font-bold text-muted-text uppercase tracking-wider mx-auto">
+        <span class="h-1.5 w-1.5 rounded-full bg-brand-accent animate-ping"></span>
+        Zero Login Tracker
+      </div>
+      
+      <h1 class="font-display text-4xl font-extrabold tracking-tight text-ink leading-[1.08] max-w-sm mx-auto">
+        Strategic attendance tracking, made simple<span class="text-brand-accent">.</span>
+      </h1>
+      
+      <p class="text-xs text-muted-text max-w-xs mx-auto leading-relaxed">
+        Calculate safe bunks, map daily lecture counts, and stay on top of requirements. No database sign-ups required — all data resides completely in your browser.
+      </p>
+    </div>
+
+    <!-- Double-Bezel Mockup Preview Card -->
+    <div class="bezel-container max-w-sm mx-auto w-full group">
+      <div class="bezel-inner space-y-4">
+        
+        <!-- Mock Header -->
+        <div class="flex justify-between items-center pb-3 border-b border-hairline">
+          <span class="text-[9px] font-bold text-muted-text uppercase tracking-wider">Preview Analytics</span>
+          <span class="px-2 py-0.5 text-[9px] font-bold text-success-state bg-emerald-50 dark:bg-emerald-950/20 rounded border border-emerald-100 dark:border-emerald-900/30 uppercase tracking-wider">
+            Safe: +3 Bunks
+          </span>
+        </div>
+
+        <!-- Mock Subject list -->
+        <div class="space-y-3">
+          <div class="p-3 border border-hairline rounded-xl bg-surface-soft/40 hover:border-muted-text transition-all duration-300">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-semibold text-xs text-ink">Database Systems</span>
+              <span class="font-bold text-xs text-ink">82.4%</span>
+            </div>
+            <div class="h-1.5 w-full bg-hairline rounded-full overflow-hidden mt-2 relative">
+              <div class="absolute top-0 bottom-0 w-0.5 bg-ink/30 z-10" style="left: 75%"></div>
+              <div class="h-full bg-success-state rounded-full" style="width: 82.4%"></div>
+            </div>
+            <span class="text-[8px] font-bold text-success-state block mt-2.5 uppercase tracking-wider">
+              ✓ Safe to skip next 2 classes
+            </span>
+          </div>
+
+          <div class="p-3 border border-hairline rounded-xl bg-surface-soft/40 hover:border-muted-text transition-all duration-300">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-semibold text-xs text-ink">Mathematics III</span>
+              <span class="font-bold text-xs text-ink">64.0%</span>
+            </div>
+            <div class="h-1.5 w-full bg-hairline rounded-full overflow-hidden mt-2 relative">
+              <div class="absolute top-0 bottom-0 w-0.5 bg-ink/30 z-10" style="left: 75%"></div>
+              <div class="h-full bg-error-state rounded-full" style="width: 64%"></div>
+            </div>
+            <span class="text-[8px] font-bold text-error-state block mt-2.5 uppercase tracking-wider">
+              ⚠ Shortage! Attend next 5 classes to recover
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Call to Actions -->
+    <div class="pt-4 max-w-xs mx-auto w-full text-center">
+      <a
+        href="/onboarding"
+        class="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full bg-primary hover:bg-primary-active text-canvas text-xs font-bold transition-all duration-300 active:scale-95 shadow-md shadow-brand-glow no-underline cursor-pointer group"
+      >
+        Start Tracking
+        <svg class="h-4 w-4 stroke-[2] group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // Client-side routing check
+    const raw = localStorage.getItem("presento-attendance-store");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.state?.semester?.initialized) {
+          window.location.href = (window as any).route ? (window as any).route("/dashboard") : "/dashboard";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  </script>
+</Layout>

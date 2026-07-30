@@ -1,0 +1,741 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Dashboard | Presento">
+  <div class="space-y-6 flex-grow flex flex-col justify-start animate-in fade-in duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
+    
+    <!-- Greeting Block -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-extrabold tracking-tight text-ink">
+          Hi, <span id="student-greeting" class="text-brand-accent">Student</span>
+        </h1>
+        <p class="text-[10px] text-muted-text uppercase tracking-wider font-semibold mt-0.5">
+          Real-time Attendance Cockpit
+        </p>
+      </div>
+      <div id="today-date-badge" class="bg-surface-soft border border-hairline px-3 py-1.5 rounded-full text-[9px] font-bold text-ink shadow-sm">
+        Monday, 2026-07-30
+      </div>
+    </div>
+
+    <!-- Welcome / Attendance Alert Banner -->
+    <div id="unmarked-alert-banner" class="hidden bezel-container w-full border-brand-accent/25 bg-brand-glow/5">
+      <div class="bezel-inner flex items-center justify-between p-3.5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-2.5 w-2.5 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-accent"></span>
+          </span>
+          <div>
+            <span class="font-bold text-xs text-ink block">Mark Your Attendance!</span>
+            <span class="text-[9px] text-muted-soft uppercase tracking-wider block mt-0.5" id="unmarked-banner-text">You have unmarked lectures today.</span>
+          </div>
+        </div>
+        <button
+          id="btn-scroll-to-agenda"
+          class="h-8 px-4 rounded-full bg-primary hover:bg-primary-active text-canvas text-[9px] font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+        >
+          Mark Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Bento Stack -->
+    <div class="space-y-4">
+      
+      <!-- Card 1: Overall Semester Progress Radial Meter -->
+      <div class="bezel-container w-full">
+        <div class="bezel-inner flex flex-col items-center justify-center py-6">
+          <span class="text-[9px] font-bold tracking-wider uppercase text-muted-text mb-4">
+            Overall Semester Attendance
+          </span>
+          
+          <div class="relative h-32 w-32">
+            <svg class="h-full w-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle
+                class="text-hairline-soft"
+                stroke-width="7"
+                stroke="currentColor"
+                fill="transparent"
+                r="40"
+                cx="50"
+                cy="50"
+              />
+              <circle
+                id="overall-ring"
+                class="text-brand-accent transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                stroke-width="7"
+                stroke-linecap="round"
+                stroke-dasharray="0 251.2"
+                fill="transparent"
+                r="40"
+                cx="50"
+                cy="50"
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="overall-percentage" class="text-3xl font-extrabold text-ink tracking-tighter">0%</span>
+              <span id="overall-target-label" class="text-[8px] uppercase tracking-wider text-muted-soft font-bold mt-0.5">
+                Goal: 75%
+              </span>
+            </div>
+          </div>
+
+          <div id="overall-bunk-badge" class="mt-5 w-full flex justify-center">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Today's Sequential Logger -->
+      <div class="bezel-container w-full" id="agenda-card-anchor">
+        <div class="bezel-inner space-y-4">
+          <div class="flex justify-between items-center pb-2.5 border-b border-hairline">
+            <span class="text-[9px] font-bold tracking-wider uppercase text-muted-text">
+              Today's Lectures List
+            </span>
+            <div class="flex gap-1.5">
+              <button
+                id="btn-present-all"
+                class="px-2.5 py-1.5 text-[8px] font-bold border border-hairline rounded-full bg-canvas hover:bg-surface-soft text-muted-text transition-colors cursor-pointer"
+              >
+                Present All
+              </button>
+              <button
+                id="btn-absent-all"
+                class="px-2.5 py-1.5 text-[8px] font-bold border border-hairline rounded-full bg-canvas hover:bg-surface-soft text-muted-text transition-colors cursor-pointer"
+              >
+                Absent All
+              </button>
+              <button
+                id="btn-cancel-all"
+                class="px-2.5 py-1.5 text-[8px] font-bold border border-hairline rounded-full bg-canvas hover:bg-surface-soft text-muted-text transition-colors cursor-pointer"
+              >
+                Cancel All
+              </button>
+            </div>
+          </div>
+
+          <div id="today-agenda-container" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Metrics split -->
+      <div class="bezel-container w-full">
+        <div class="bezel-inner space-y-4">
+          <span class="text-[9px] font-bold tracking-wider uppercase text-muted-text block">
+            Lecture Type splits
+          </span>
+          <div class="space-y-3.5">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-ink font-bold">Theory classes</span>
+                <span id="theory-percentage" class="text-brand-accent">0%</span>
+              </div>
+              <div class="h-1.5 w-full bg-hairline rounded-full overflow-hidden">
+                <div id="theory-progress-bar" class="h-full bg-brand-accent rounded-full transition-all duration-500 w-0"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-ink font-bold">Practical Labs</span>
+                <span id="practical-percentage" class="text-success-state">0%</span>
+              </div>
+              <div class="h-1.5 w-full bg-hairline rounded-full overflow-hidden">
+                <div id="practical-progress-bar" class="h-full bg-success-state rounded-full transition-all duration-500 w-0"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Course Cards Matrix -->
+    <div class="space-y-4 pt-2">
+      <h2 class="font-display text-sm font-extrabold text-ink uppercase tracking-wider">
+        Course Breakdowns
+      </h2>
+      <div id="course-cards-container" class="grid grid-cols-1 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const store = {
+      get() {
+        const raw = localStorage.getItem("presento-attendance-store");
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            return parsed.state || { semester: null, subjects: [], timetable: [], attendanceLogs: [], holidays: [] };
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        return { semester: null, subjects: [], timetable: [], attendanceLogs: [], holidays: [] };
+      },
+      save(state: any) {
+        localStorage.setItem("presento-attendance-store", JSON.stringify({ state, version: 0 }));
+      }
+    };
+
+    let state = store.get();
+    
+    if (!state.semester || !state.semester.initialized) {
+      window.location.href = (window as any).route ? (window as any).route("/onboarding") : "/onboarding";
+    }
+
+    // Formulas
+    const calculateSafeBunks = (present: number, total: number, targetPct: number) => {
+      if (total === 0) return 0;
+      const R = targetPct / 100;
+      if (present / total < R) return 0;
+      return Math.floor((present - R * total) / R);
+    };
+
+    const calculateRequiredAttendance = (present: number, total: number, targetPct: number) => {
+      const R = targetPct / 100;
+      if (total === 0 || (present / total) >= R) return 0;
+      if (R >= 1.0) return Infinity;
+      return Math.ceil((R * total - present) / (1 - R));
+    };
+
+    // Date variables
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const todayStr = `${year}-${month}-${day}`;
+
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayName = days[today.getDay()];
+    const currentDayOfWeek = today.getDay() === 0 ? 1 : today.getDay();
+
+    // Set Greeting
+    const studentGreeting = document.getElementById("student-greeting");
+    if (studentGreeting && state.semester?.studentName) {
+      studentGreeting.textContent = state.semester.studentName;
+    }
+    const todayBadge = document.getElementById("today-date-badge");
+    if (todayBadge) {
+      todayBadge.textContent = `${dayName}, ${todayStr}`;
+    }
+
+    // Dynamic Occurred Slots Evaluator - Auto-marks THEORY only
+    const getOccurredList = () => {
+      const occurred = [];
+      const start = new Date(state.semester.startDate);
+      const end = new Date(today);
+      
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+      
+      if (isNaN(start.getTime())) return [];
+
+      // Calculate IST Hour
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const ist = new Date(utc + (3600000 * 5.5));
+      const isPast5PM = ist.getHours() >= 17;
+
+      const oneDay = 24 * 60 * 60 * 1000;
+      const daysDiff = Math.floor((end.getTime() - start.getTime()) / oneDay);
+
+      for (let i = 0; i <= daysDiff; i++) {
+        const current = new Date(start.getTime() + i * oneDay);
+        const cy = current.getFullYear();
+        const cm = String(current.getMonth() + 1).padStart(2, "0");
+        const cd = String(current.getDate()).padStart(2, "0");
+        const dateStr = `${cy}-${cm}-${cd}`;
+
+        if (dateStr > todayStr) continue;
+        if (state.holidays.some((h: any) => h.date === dateStr)) continue;
+
+        const weekday = current.getDay();
+        if (weekday === 0) continue; // Sunday
+
+        const daySlots = state.timetable.filter((t: any) => t.dayOfWeek === weekday);
+        
+        daySlots.forEach((slot: any) => {
+          const log = state.attendanceLogs.find(
+            (l: any) => l.date === dateStr && l.slotId === slot.id
+          );
+
+          if (log) {
+            occurred.push({
+              date: dateStr,
+              slotId: slot.id,
+              subjectId: slot.subjectId,
+              status: log.status
+            });
+          } else {
+            // Auto-marks THEORY only
+            const subject = state.subjects.find((s: any) => s.id === slot.subjectId);
+            const isTheory = subject?.type === "THEORY";
+            
+            if (isTheory) {
+              if (dateStr < todayStr) {
+                occurred.push({
+                  date: dateStr,
+                  slotId: slot.id,
+                  subjectId: slot.subjectId,
+                  status: "PRESENT"
+                });
+              } else if (dateStr === todayStr && isPast5PM) {
+                occurred.push({
+                  date: dateStr,
+                  slotId: slot.id,
+                  subjectId: slot.subjectId,
+                  status: "PRESENT"
+                });
+              }
+            }
+          }
+        });
+      }
+
+      state.attendanceLogs.forEach((log: any) => {
+        const isSlotCaptured = occurred.some(
+          (o) => o.date === log.date && o.slotId === log.slotId
+        );
+        if (!isSlotCaptured && log.date >= state.semester.startDate && log.date <= todayStr) {
+          occurred.push({
+            date: log.date,
+            slotId: log.slotId || null,
+            subjectId: log.subjectId,
+            status: log.status
+          });
+        }
+      });
+
+      return occurred;
+    };
+
+    const renderDashboard = () => {
+      state = store.get();
+      
+      const occurredList = getOccurredList();
+
+      let theoryPresent = 0;
+      let theoryTotal = 0;
+      let practicalPresent = 0;
+      let practicalTotal = 0;
+
+      const subjectStats = state.subjects.map((sub: any) => {
+        const subLogs = occurredList.filter((l: any) => l.subjectId === sub.id);
+        
+        const present = subLogs.filter((l: any) => l.status === "PRESENT").length;
+        const absent = subLogs.filter((l: any) => l.status === "ABSENT").length;
+        const cancelled = subLogs.filter((l: any) => l.status === "CANCELLED").length;
+        const total = present + absent;
+
+        if (sub.type === "THEORY") {
+          theoryPresent += present;
+          theoryTotal += total;
+        } else {
+          practicalPresent += present;
+          practicalTotal += total;
+        }
+
+        const target = sub.targetPct || state.semester.targetPct;
+        const pct = total === 0 ? 0 : parseFloat(((present / total) * 100).toFixed(1)); // Defaults to 0% if total is 0
+        const safe = calculateSafeBunks(present, total, target);
+        const req = calculateRequiredAttendance(present, total, target);
+
+        return {
+          ...sub,
+          present,
+          absent,
+          cancelled,
+          total,
+          pct,
+          target,
+          safe,
+          req,
+        };
+      });
+
+      // Overall Progress tracks ALL subjects (present / total)
+      const globalPresent = theoryPresent + practicalPresent;
+      const globalTotal = theoryTotal + practicalTotal;
+      const targetPct = state.semester?.targetPct || 75;
+      const overallPct = globalTotal === 0 ? 0 : parseFloat(((globalPresent / globalTotal) * 100).toFixed(1)); // Defaults to 0% if total is 0
+      
+      // Safety/Shortage tracks THEORY ONLY (per 75% targets on theory)
+      const overallSafe = calculateSafeBunks(theoryPresent, theoryTotal, targetPct);
+      const overallRequired = calculateRequiredAttendance(theoryPresent, theoryTotal, targetPct);
+
+      // Render Overall Ring
+      const overallPercentageEl = document.getElementById("overall-percentage");
+      const overallRing = document.getElementById("overall-ring");
+      const overallTargetLabel = document.getElementById("overall-target-label");
+      
+      if (overallPercentageEl) overallPercentageEl.textContent = `${overallPct}%`;
+      if (overallTargetLabel) overallTargetLabel.textContent = `Goal: ${targetPct}%`;
+      if (overallRing) {
+        overallRing.setAttribute("stroke-dasharray", `${(overallPct / 100) * 251.2} 251.2`);
+        overallRing.classList.remove("text-success-state", "text-warning-state", "text-error-state");
+        if (overallPct >= targetPct + 5) {
+          overallRing.classList.add("text-success-state");
+        } else if (overallPct < targetPct) {
+          overallRing.classList.add("text-error-state");
+        } else {
+          overallRing.classList.add("text-warning-state");
+        }
+      }
+
+      // Bunk allowance badge
+      const overallBunkBadge = document.getElementById("overall-bunk-badge");
+      if (overallBunkBadge) {
+        if (overallPct >= targetPct) {
+          overallBunkBadge.innerHTML = `
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-success-state bg-emerald-50 dark:bg-emerald-950/20 px-4 py-2 rounded-full border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+              <span class="h-2 w-2 rounded-full bg-success-state"></span>
+              Theory Bunks Left: ${overallSafe} lectures
+            </div>
+          `;
+        } else {
+          overallBunkBadge.innerHTML = `
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-error-state bg-rose-50 dark:bg-rose-950/20 px-4 py-2 rounded-full border border-rose-100 dark:border-rose-900/30 shadow-sm">
+              <span class="h-2 w-2 rounded-full bg-error-state"></span>
+              Theory Shortage: Attend next ${overallRequired} lectures
+            </div>
+          `;
+        }
+      }
+
+      // Splits
+      const theoryPct = theoryTotal === 0 ? 0 : parseFloat(((theoryPresent / theoryTotal) * 100).toFixed(0));
+      const practicalPct = practicalTotal === 0 ? 0 : parseFloat(((practicalPresent / practicalTotal) * 100).toFixed(0));
+
+      const theoryPercentageEl = document.getElementById("theory-percentage");
+      const theoryProgressBar = document.getElementById("theory-progress-bar");
+      if (theoryPercentageEl) theoryPercentageEl.textContent = `${theoryPct}%`;
+      if (theoryProgressBar) theoryProgressBar.style.width = `${theoryPct}%`;
+
+      const practicalPercentageEl = document.getElementById("practical-percentage");
+      const practicalProgressBar = document.getElementById("practical-progress-bar");
+      if (practicalPercentageEl) practicalPercentageEl.textContent = `${practicalPct}%`;
+      if (practicalProgressBar) practicalProgressBar.style.width = `${practicalPct}%`;
+
+      // Today's lectures list
+      const todayAgendaContainer = document.getElementById("today-agenda-container");
+      const todaySlots = state.timetable
+        .filter((t: any) => t.dayOfWeek === currentDayOfWeek)
+        .sort((a: any, b: any) => a.sequenceOrder - b.sequenceOrder);
+
+      // Unmarked Lectures Alert Banner
+      const unmarkedAlertBanner = document.getElementById("unmarked-alert-banner");
+      const unmarkedBannerText = document.getElementById("unmarked-banner-text");
+      const unmarkedTodayCount = todaySlots.filter((slot: any) => {
+        return !state.attendanceLogs.some(
+          (l: any) => l.date === todayStr && l.slotId === slot.id
+        );
+      }).length;
+
+      if (unmarkedAlertBanner) {
+        if (unmarkedTodayCount > 0) {
+          unmarkedAlertBanner.classList.remove("hidden");
+          if (unmarkedBannerText) {
+            unmarkedBannerText.textContent = `You have ${unmarkedTodayCount} unmarked lecture${unmarkedTodayCount > 1 ? 's' : ''} scheduled for today.`;
+          }
+        } else {
+          unmarkedAlertBanner.classList.add("hidden");
+        }
+      }
+
+      if (todayAgendaContainer) {
+        todayAgendaContainer.innerHTML = "";
+        
+        if (todaySlots.length === 0) {
+          todayAgendaContainer.innerHTML = `
+            <div class="flex-grow flex flex-col items-center justify-center text-center p-6 border border-dashed border-hairline rounded-xl bg-surface-soft/40">
+              <p class="text-xs text-muted-text font-bold uppercase tracking-wider">Free day!</p>
+              <p class="text-[10px] text-muted-soft">No lectures scheduled today.</p>
+            </div>
+          `;
+        } else {
+          todaySlots.forEach((slot: any, idx: number) => {
+            const subject = state.subjects.find((s: any) => s.id === slot.subjectId);
+            const realLog = state.attendanceLogs.find(
+              (l: any) => l.date === todayStr && l.slotId === slot.id
+            );
+            const currentStatus = realLog?.status || null;
+
+            const card = document.createElement("div");
+            card.className = "flex items-center justify-between p-3 border border-hairline rounded-xl bg-surface-soft/40 hover:border-muted-text transition-all duration-300";
+            card.innerHTML = `
+              <div class="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
+                <div class="h-6 w-6 rounded-full bg-primary text-canvas flex items-center justify-center text-[10px] font-extrabold font-display shrink-0 select-none">
+                  ${idx + 1}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <span class="font-bold text-xs text-ink truncate block">${subject ? subject.name : "Unknown"}</span>
+                  <span class="text-[8px] uppercase tracking-wider text-muted-soft font-bold">${subject?.type === "THEORY" ? "Theory" : "Lab"}</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button class="btn-mark-status h-8 w-8 flex items-center justify-center border rounded-full transition-all duration-300 active:scale-90 cursor-pointer ${
+                  currentStatus === "PRESENT"
+                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-success-glow"
+                    : "border-hairline bg-canvas text-muted-text hover:text-emerald-500"
+                }" data-slot-id="${slot.id}" data-subject-id="${slot.subjectId}" data-status="PRESENT" title="Mark Present">
+                  <svg class="h-3.5 w-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </button>
+                <button class="btn-mark-status h-8 w-8 flex items-center justify-center border rounded-full transition-all duration-300 active:scale-90 cursor-pointer ${
+                  currentStatus === "ABSENT"
+                    ? "bg-rose-50 border-rose-500 text-rose-500 dark:bg-rose-950/20 dark:border-rose-900/30"
+                    : "border-hairline bg-canvas text-muted-text hover:text-rose-500"
+                }" data-slot-id="${slot.id}" data-subject-id="${slot.subjectId}" data-status="ABSENT" title="Mark Absent">
+                  <svg class="h-3.5 w-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <button class="btn-mark-status h-8 w-8 flex items-center justify-center border rounded-full text-[10px] font-extrabold transition-all duration-300 active:scale-90 cursor-pointer ${
+                  currentStatus === "CANCELLED"
+                    ? "bg-amber-500 border-amber-500 text-white"
+                    : "border-hairline bg-canvas text-muted-text hover:text-amber-500"
+                }" data-slot-id="${slot.id}" data-subject-id="${slot.subjectId}" data-status="CANCELLED" title="Mark Cancelled">
+                  C
+                </button>
+              </div>
+            `;
+            todayAgendaContainer.appendChild(card);
+          });
+
+          // Click logs
+          document.querySelectorAll(".btn-mark-status").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const target = e.currentTarget as HTMLButtonElement;
+              const slotId = target.getAttribute("data-slot-id") || "";
+              const subId = target.getAttribute("data-subject-id") || "";
+              const status = target.getAttribute("data-status") as AttendanceStatus;
+
+              const existingIdx = state.attendanceLogs.findIndex(
+                (l: any) => l.date === todayStr && l.slotId === slotId
+              );
+
+              if (existingIdx >= 0) {
+                if (state.attendanceLogs[existingIdx].status === status) {
+                  state.attendanceLogs = state.attendanceLogs.filter((_, idx) => idx !== existingIdx);
+                } else {
+                  state.attendanceLogs[existingIdx].status = status;
+                  state.attendanceLogs[existingIdx].updatedAt = new Date().toISOString();
+                }
+              } else {
+                state.attendanceLogs.push({
+                  id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
+                  subjectId: subId,
+                  slotId,
+                  date: todayStr,
+                  status,
+                  updatedAt: new Date().toISOString(),
+                });
+              }
+
+              store.save(state);
+              renderDashboard();
+            });
+          });
+        }
+      }
+
+      // Course lists
+      const courseCardsContainer = document.getElementById("course-cards-container");
+      if (courseCardsContainer) {
+        courseCardsContainer.innerHTML = "";
+        
+        if (subjectStats.length === 0) {
+          courseCardsContainer.innerHTML = `
+            <div class="bezel-container w-full">
+              <div class="bezel-inner text-center py-6">
+                <p class="text-xs text-muted-text font-bold uppercase">No subjects configured</p>
+              </div>
+            </div>
+          `;
+        } else {
+          subjectStats.forEach((sub: any) => {
+            const barBg = 
+              sub.pct >= sub.target + 5
+                ? "bg-success-state shadow-sm shadow-success-glow"
+                : sub.pct < sub.target
+                ? "bg-error-state shadow-sm shadow-error-glow"
+                : "bg-warning-state";
+
+            const statsBadge = sub.pct >= sub.target
+              ? `<span class="text-xs font-bold text-success-state">Safe to bunk: ${sub.safe} classes</span>`
+              : `<span class="text-xs font-bold text-error-state">Attend: next ${sub.req} classes</span>`;
+
+            const card = document.createElement("div");
+            card.className = "bezel-container w-full";
+            card.innerHTML = `
+              <div class="bezel-inner flex flex-col justify-between h-48">
+                <div>
+                  <div class="flex justify-between items-start gap-2">
+                    <div class="min-w-0 flex-1">
+                      <h4 class="font-display text-sm font-extrabold text-ink truncate leading-snug">${sub.name}</h4>
+                      ${sub.code ? `<span class="text-[8px] font-bold uppercase tracking-wider text-muted-soft block mt-0.5">${sub.code}</span>` : ""}
+                    </div>
+                    
+                    <span class="px-2 py-0.5 text-[8px] font-bold tracking-wider rounded uppercase bg-surface-soft text-muted-text border border-hairline shrink-0">${sub.type === "THEORY" ? "Theory" : "Lab"}</span>
+                  </div>
+
+                  <!-- Quick Action Pills -->
+                  <div class="flex items-center gap-1.5 mt-2">
+                    <button class="btn-quick-log px-2.5 py-1 text-[8px] font-bold border border-hairline rounded-full bg-canvas text-ink hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:text-emerald-500 cursor-pointer" data-id="${sub.id}" data-status="PRESENT">
+                      + Present
+                    </button>
+                    <button class="btn-quick-log px-2.5 py-1 text-[8px] font-bold border border-hairline rounded-full bg-canvas text-ink hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-500 cursor-pointer" data-id="${sub.id}" data-status="ABSENT">
+                      + Absent
+                    </button>
+                  </div>
+
+                  <div class="mt-3">
+                    <div class="flex justify-between items-baseline mb-1">
+                      <span class="text-lg font-extrabold text-ink tracking-tight">${sub.pct}%</span>
+                      <span class="text-[8px] text-muted-soft font-bold uppercase tracking-wider">Goal: ${sub.target}% (Ratio: ${sub.present}/${sub.total})</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-hairline rounded-full overflow-hidden relative">
+                      <div class="absolute top-0 bottom-0 w-0.5 bg-ink/30 z-10" style="left: ${sub.target}%"></div>
+                      <div class="h-full rounded-full ${barBg}" style="width: ${sub.pct}%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-hairline pt-3 flex justify-between items-center mt-2.5">
+                  <div class="min-w-0 flex-1">
+                    ${statsBadge}
+                  </div>
+                  
+                  <a href="/subject?id=${sub.id}" class="h-7 w-7 flex items-center justify-center rounded-full border border-hairline bg-canvas hover:bg-surface-soft text-ink transition-all duration-300 active:scale-95 no-underline">
+                    <svg class="h-3.5 w-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </a>
+                </div>
+              </div>
+            `;
+            courseCardsContainer.appendChild(card);
+          });
+
+          // Quick log card actions
+          document.querySelectorAll(".btn-quick-log").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const target = e.currentTarget as HTMLButtonElement;
+              const subId = target.getAttribute("data-id") || "";
+              const status = target.getAttribute("data-status") as AttendanceStatus;
+
+              const todaySlots = state.timetable.filter(
+                (t: any) => t.dayOfWeek === currentDayOfWeek && t.subjectId === subId
+              );
+
+              let targetSlotId = null;
+              for (const slot of todaySlots) {
+                const log = state.attendanceLogs.find(
+                  (l: any) => l.date === todayStr && l.slotId === slot.id
+                );
+                if (!log) {
+                  targetSlotId = slot.id;
+                  break;
+                }
+              }
+
+              state.attendanceLogs.push({
+                id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
+                subjectId: subId,
+                slotId: targetSlotId,
+                date: todayStr,
+                status,
+                updatedAt: new Date().toISOString(),
+              });
+
+              store.save(state);
+              renderDashboard();
+            });
+          });
+        }
+      }
+    };
+
+    // Scroll to lectures agenda smooth scroll
+    document.getElementById("btn-scroll-to-agenda")?.addEventListener("click", () => {
+      document.getElementById("agenda-card-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    // Global Buttons Actions
+    document.getElementById("btn-present-all")?.addEventListener("click", () => {
+      const todaySlots = state.timetable.filter((t: any) => t.dayOfWeek === currentDayOfWeek);
+      todaySlots.forEach((slot: any) => {
+        const existingIdx = state.attendanceLogs.findIndex(
+          (l: any) => l.date === todayStr && l.slotId === slot.id
+        );
+        if (existingIdx >= 0) {
+          state.attendanceLogs[existingIdx].status = "PRESENT";
+        } else {
+          state.attendanceLogs.push({
+            id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
+            subjectId: slot.subjectId,
+            slotId: slot.id,
+            date: todayStr,
+            status: "PRESENT",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      });
+      store.save(state);
+      renderDashboard();
+    });
+
+    document.getElementById("btn-absent-all")?.addEventListener("click", () => {
+      const todaySlots = state.timetable.filter((t: any) => t.dayOfWeek === currentDayOfWeek);
+      todaySlots.forEach((slot: any) => {
+        const existingIdx = state.attendanceLogs.findIndex(
+          (l: any) => l.date === todayStr && l.slotId === slot.id
+        );
+        if (existingIdx >= 0) {
+          state.attendanceLogs[existingIdx].status = "ABSENT";
+        } else {
+          state.attendanceLogs.push({
+            id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
+            subjectId: slot.subjectId,
+            slotId: slot.id,
+            date: todayStr,
+            status: "ABSENT",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      });
+      store.save(state);
+      renderDashboard();
+    });
+
+    document.getElementById("btn-cancel-all")?.addEventListener("click", () => {
+      const todaySlots = state.timetable.filter((t: any) => t.dayOfWeek === currentDayOfWeek);
+      todaySlots.forEach((slot: any) => {
+        const existingIdx = state.attendanceLogs.findIndex(
+          (l: any) => l.date === todayStr && l.slotId === slot.id
+        );
+        if (existingIdx >= 0) {
+          state.attendanceLogs[existingIdx].status = "CANCELLED";
+        } else {
+          state.attendanceLogs.push({
+            id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9),
+            subjectId: slot.subjectId,
+            slotId: slot.id,
+            date: todayStr,
+            status: "CANCELLED",
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      });
+      store.save(state);
+      renderDashboard();
+    });
+
+    renderDashboard();
+  </script>
+</Layout>

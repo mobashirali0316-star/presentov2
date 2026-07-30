@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  semesters    Semester[]
+
+  @@map("users")
+}
+
+model Semester {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  targetPct Decimal   @default(75.00) @db.Decimal(5, 2)
+  subjects  Subject[]
+  holidays  Holiday[]
+
+  @@index([userId])
+  @@map("semesters")
+}
+
+enum SubjectType {
+  THEORY
+  PRACTICAL
+}
+
+model Subject {
+  id             String          @id @default(uuid())
+  semesterId     String
+  semester       Semester        @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  name           String
+  code           String?
+  type           SubjectType
+  targetPct      Decimal?        @db.Decimal(5, 2)
+  timetableSlots TimetableSlot[]
+  attendanceLogs AttendanceLog[]
+
+  @@index([semesterId])
+  @@map("subjects")
+}
+
+model TimetableSlot {
+  id             String          @id @default(uuid())
+  subjectId      String
+  subject        Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  dayOfWeek      Int // 1 = Monday, 6 = Saturday
+  startTime      String // "09:00"
+  endTime        String // "10:00"
+  attendanceLogs AttendanceLog[]
+
+  @@index([subjectId])
+  @@map("timetable_slots")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  CANCELLED
+}
+
+model AttendanceLog {
+  id        String           @id @default(uuid())
+  subjectId String
+  subject   Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  slotId    String?
+  slot      TimetableSlot?   @relation(fields: [slotId], references: [id], onDelete: SetNull)
+  date      DateTime // ISO date string (time zeroed out)
+  status    AttendanceStatus
+  updatedAt DateTime         @updatedAt
+
+  @@index([subjectId])
+  @@index([date])
+  @@index([subjectId, date])
+  @@map("attendance_logs")
+}
+
+model Holiday {
+  id         String   @id @default(uuid())
+  semesterId String
+  semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  date       DateTime
+  name       String
+
+  @@index([semesterId])
+  @@map("holidays")
+}

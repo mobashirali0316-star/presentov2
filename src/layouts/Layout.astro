@@ -1,0 +1,191 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  hideNav?: boolean;
+}
+
+const { title = "Presento", hideNav = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    
+    <!-- Google Fonts Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Blocking script to inject theme immediately and prevent UI flashes -->
+    <script is:inline>
+      const getTheme = () => {
+        if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+          return localStorage.getItem("theme");
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      };
+      const theme = getTheme();
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+    
+    <!-- Path router prefix helper for GitHub Pages -->
+    <script is:inline>
+      window.route = (path) => {
+        const isGhPages = window.location.pathname.startsWith("/Presento");
+        return isGhPages ? "/Presento" + path : path;
+      };
+
+      // Intercept anchor clicks to apply base prefix on GitHub Pages
+      document.addEventListener("click", (e) => {
+        const target = e.target.closest("a");
+        if (target) {
+          const href = target.getAttribute("href");
+          if (href && href.startsWith("/") && !href.startsWith("/Presento")) {
+            e.preventDefault();
+            window.location.href = window.route(href);
+          }
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-surface-soft dark:bg-surface-dark-elevated antialiased min-h-screen flex flex-col justify-start">
+    
+    <!-- Phone Frame Container -->
+    <div class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-canvas border-x border-hairline shadow-2xl relative pb-28">
+      
+      <!-- Premium Slim Header -->
+      <header class="h-16 w-full border-b border-hairline flex items-center justify-between px-6 bg-canvas/80 backdrop-blur-md sticky top-0 z-40">
+        <a href="/" class="flex items-center gap-1.5 no-underline">
+          <div class="h-6 w-6 rounded-lg bg-primary flex items-center justify-center text-canvas font-bold text-xs select-none">P</div>
+          <span class="font-display text-lg font-extrabold tracking-tight text-ink">
+            presento<span class="text-brand-accent">.</span>
+          </span>
+        </a>
+        
+        <div class="flex items-center gap-2">
+          <!-- Dark Mode Toggle -->
+          <button
+            id="theme-toggle"
+            class="h-8 w-8 flex items-center justify-center border border-hairline bg-canvas hover:bg-surface-soft text-ink rounded-full transition-all duration-300 active:scale-90 cursor-pointer"
+            title="Toggle Theme"
+            aria-label="Toggle Theme"
+          >
+            <!-- Sun Icon (Active in Dark mode) -->
+            <svg id="sun-icon" class="h-3.5 w-3.5 hidden text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l.707.707M7.757 6.343l.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <!-- Moon Icon (Active in Light mode) -->
+            <svg id="moon-icon" class="h-3.5 w-3.5 hidden text-muted-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Core Slot -->
+      <main class="flex-grow flex flex-col px-5 py-6">
+        <slot />
+      </main>
+
+      <!-- Floating Glassmorphic Dock Navigation Pill -->
+      {!hideNav && (
+        <nav id="mobile-nav" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[360px] border border-hairline bg-canvas/80 dark:bg-surface-card/85 backdrop-blur-xl px-5 py-2.5 rounded-full items-center justify-around shadow-2xl z-50 transition-all duration-300">
+          
+          <a href="/dashboard" class="flex flex-col items-center gap-1 text-[9px] font-bold text-muted-text hover:text-ink no-underline nav-link group transition-all duration-200" data-path="/dashboard">
+            <svg class="h-4 w-4 stroke-[2] group-hover:scale-105 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Dashboard
+          </a>
+          
+          <a href="/calendar" class="flex flex-col items-center gap-1 text-[9px] font-bold text-muted-text hover:text-ink no-underline nav-link group transition-all duration-200" data-path="/calendar">
+            <svg class="h-4 w-4 stroke-[2] group-hover:scale-105 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Calendar
+          </a>
+          
+          <a href="/settings" class="flex flex-col items-center gap-1 text-[9px] font-bold text-muted-text hover:text-ink no-underline nav-link group transition-all duration-200" data-path="/settings">
+            <svg class="h-4 w-4 stroke-[2] group-hover:scale-105 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </a>
+          
+        </nav>
+      )}
+
+    </div>
+
+    <!-- Client Script -->
+    <script>
+      // 1. Dark Mode Controller
+      const themeToggleBtn = document.getElementById("theme-toggle");
+      const sunIcon = document.getElementById("sun-icon");
+      const moonIcon = document.getElementById("moon-icon");
+
+      const updateThemeUI = (isDark: boolean) => {
+        if (isDark) {
+          sunIcon?.classList.remove("hidden");
+          moonIcon?.classList.add("hidden");
+        } else {
+          sunIcon?.classList.add("hidden");
+          moonIcon?.classList.remove("hidden");
+        }
+      };
+
+      let isDark = document.documentElement.classList.contains("dark");
+      updateThemeUI(isDark);
+
+      themeToggleBtn?.addEventListener("click", () => {
+        isDark = !isDark;
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        }
+        updateThemeUI(isDark);
+      });
+
+      // 2. Active Tab Highlighter and Navigation Visibility
+      const currentPath = window.location.pathname;
+      const semester = localStorage.getItem("presento-attendance-store");
+      const mobileNav = document.getElementById("mobile-nav");
+
+      if (semester) {
+        try {
+          const storeData = JSON.parse(semester);
+          if (storeData.state?.semester?.initialized) {
+            mobileNav?.classList.remove("hidden");
+            mobileNav?.classList.add("flex");
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      const navLinks = document.querySelectorAll(".nav-link");
+      navLinks.forEach((link) => {
+        const path = link.getAttribute("data-path");
+        if (path === currentPath || (currentPath === "/subject" && path === "/dashboard")) {
+          link.classList.remove("text-muted-text");
+          link.classList.add("text-brand-accent", "font-bold");
+        }
+      });
+    </script>
+  </body>
+</html>
